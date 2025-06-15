@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "sourceMap": true, 
+        "target": "ES2016",
+        "outDir": "./dist",
+        "strict": true, 
+        "module" : "CommonJS",
+        "baseUrl": ".", 
+        "allowSyntheticDefaultImports": true, 
+        "esModuleInterop": true, 
+        "forceConsistentCasingInFileNames": true
+    }, 
+    "include": [
+        "src/**/*"
+    ], 
+    "exclude": [
+        "node_modules"
+    ]
+}
