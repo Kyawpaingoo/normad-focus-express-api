@@ -14,4 +14,90 @@ generator client {
   previewFeatures = ["driverAdapters"]
 }
 
+model User {
+  id            Int           @id @default(autoincrement())
+  name          String?       @db.VarChar(50)
+  email         String?       @db.VarChar(50)
+  password      String?       @db.VarChar(255)
+  refresh_token String?       @db.VarChar(255)
+  created_at    DateTime?     @default(now())
+  updataed_at   DateTime?
+
+  expenses          Expense[]
+  country_logs      CountryLog[]
+  meeting_schedules MeetingSchedule[]
+  tasks             Task[]
+  notifications     Notification[]
+}
+
+model Expense {
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  titile       String?   @db.VarChar(50)
+  category     String?   @db.VarChar(50)
+  amount       Decimal?
+  currency     String?   @default("USD") @db.VarChar(10)
+  expense_date DateTime?
+  created_at   DateTime? @default(now())
+  is_deleted   Boolean?
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model CountryLog {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  country_name    String?   @db.VarChar(50)
+  visa_type       String?   @db.VarChar(50)
+  entry_date      DateTime?
+  exit_date       DateTime?
+  visa_limit_days Int?
+  notify_at       DateTime?
+  created_at      DateTime? @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model MeetingSchedule {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  title       String?   @db.VarChar(255)
+  description String?   @db.Text // MAX-like behavior
+  start_time  DateTime
+  end_time    DateTime
+  created_at  DateTime? @default(now())
+  is_deleted  Boolean?
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  title       String?   @db.VarChar(50)
+  description String?   @db.Text
+  status      String?   @db.VarChar(50)
+  priority    String? 
+  start_date  DateTime?
+  due_date    DateTime?
+  notify_at   DateTime?
+  created_at  DateTime? @default(now())
+  is_deleted  Boolean?
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  user_id     Int
+  source_type String? 
+  source_id   Int
+  message     String?          @db.Text
+  notify_at   DateTime?
+  sent_at     DateTime?
+  created_at  DateTime?        @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
 

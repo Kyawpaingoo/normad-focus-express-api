@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import prisma from './prisma';
+import authRouter from './router/authRouter';
 
 const app = express();
 dotenv.config();
@@ -16,6 +17,7 @@ const port = process.env.HTTP_PORT;
 async function main()
 {
     try {
+        app.use('/api/auth', authRouter);
         app.listen(port,()=> {
             console.log(`Server is running on port ${port}`);
         });
