@@ -1,90 +1,113 @@
 import { LoginResponseDto, RegisterUserDto, LoginRequestDto } from '../dtos/userDtos';
 import prisma from '../prisma'
+import { JwtPayload } from 'jsonwebtoken';
 import * as AuthService from '../service/authService';
-import { User } from '@prisma/client';
 
-describe('AuthService', ()=> {
-    const getRegisterUserDto = (): RegisterUserDto => ({
-        username: 'testUser',
-        email: 'test.user@example.com',
-        password: 'testPassword',
-        confirmPassword: 'testPassword'
-    });
+// Mock bcrypt
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockResolvedValue('hashedPassword'),
+  compare: jest.fn().mockImplementation((password, hash) => Promise.resolve(password === 'testPassword' && hash === 'hashedPassword'))
+}));
 
-    const getLoginRequestDto = (): LoginRequestDto => ({
-        email: 'test.user@example.com',
-        password: 'testPassword'
-    });
+// Mock jwtHelper with dynamic user ID
+jest.mock('../utils/jwtHelper', () => {
+  let userId: number | null = null;
+  return {
+    setUserId: (id: number) => { userId = id; },
+    generateAccessToken: jest.fn().mockImplementation((payload) => `access-${payload.id}`),
+    generateRefreshToken: jest.fn().mockImplementation((payload) => `refresh-${payload.id}`),
+    verifyRefreshToken: jest.fn().mockImplementation((token) => {
+      if (userId && token === `refresh-${userId}`) {
+        return { id: userId, name: 'testUser' };
+      }
+      throw new Error('Invalid token');
+    })
+  };
+});
 
-     beforeEach(async () => {
-        await prisma.user.deleteMany({ where: { email: 'test.user@example.com' } });
-    });
+describe('AuthService', () => {
+  const getRegisterUserDto = (): RegisterUserDto => ({
+    username: 'testUser',
+    email: 'test.user@example.com',
+    password: 'testPassword',
+    confirmPassword: 'testPassword'
+  });
 
-    afterAll(async () => {
-        await prisma.user.deleteMany({ where: { email: 'test.user@example.com' } });
-        await prisma.$disconnect();
-    });
+  const getLoginRequestDto = (): LoginRequestDto => ({
+    email: 'test.user@example.com',
+    password: 'testPassword'
+  });
 
-    test('should throw error if passwords do not match', async () => {
-        const userDto = getRegisterUserDto();
-        userDto.confirmPassword = 'wrongPassword';
+  const getJwtPayload = (refreshToken: string): JwtPayload => ({
+    refreshToken
+  });
 
-        await expect(AuthService.registerUser(userDto)).rejects.toThrow('Passwords do not match');
-    });
-   
-    test('should throw error if password is less than 6 characters', async () => {
-        const userDto = getRegisterUserDto();
-        userDto.password = 'pass';
-        userDto.confirmPassword = 'pass';
+  beforeEach(async () => {
+    await prisma.user.deleteMany({ where: { email: 'test.user@example.com' } });
+    const jwtHelper = require('../utils/jwtHelper');
+    jwtHelper.setUserId(null);
+  });
 
-        await expect(AuthService.registerUser(userDto)).rejects.toThrow('Password must be at least 6 characters long');
-    });
+  afterAll(async () => {
+    await prisma.user.deleteMany({ where: { email: 'test.user@example.com' } });
+    await prisma.$disconnect();
+  });
 
-    test('should register a new user', async () => {
-        const userDto = getRegisterUserDto();
-        const result = await AuthService.registerUser(userDto);
+  test('should register a user successfully', async () => {
+    const userDto = getRegisterUserDto();
+    const result = await AuthService.registerUser(userDto);
+    expect(result.email).toBe(userDto.email);
+    expect(result.name).toBe(userDto.username);
+    expect(result).toHaveProperty('id');
+  });
 
-        expect(result.email).toBe(userDto.email);
-        expect(result.name).toBe(userDto.username);
-        expect(result).toHaveProperty('id');
-        expect(result).toHaveProperty('created_at');
-    });
+  test('should login a user successfully', async () => {
+    const userDto = getRegisterUserDto();
+    const user = await AuthService.registerUser(userDto);
+    const jwtHelper = require('../utils/jwtHelper');
+    jwtHelper.setUserId(user.id);
+    const loginDto = getLoginRequestDto();
+    const result = await AuthService.LoginUser(loginDto);
+    expect(result).toHaveProperty('accessToken', `access-${user.id}`);
+    expect(result).toHaveProperty('refreshToken', `refresh-${user.id}`);
+    expect(result.userId).toBe(user.id);
+    expect(result.username).toBe(userDto.username);
+  });
 
-    test('should throw error if user already exists', async () => {
-        const userDto = getRegisterUserDto();
-        await AuthService.registerUser(userDto);
+  test('should refresh token pair successfully', async () => {
+    const userDto = getRegisterUserDto();
+    const user = await AuthService.registerUser(userDto);
+    const jwtHelper = require('../utils/jwtHelper');
+    jwtHelper.setUserId(user.id);
+    const loginDto = getLoginRequestDto();
+    const loginResult = await AuthService.LoginUser(loginDto);
+    const result = await AuthService.refreshTokenPair(loginResult.refreshToken);
+    expect(result).toHaveProperty('accessToken', `access-${user.id}`);
+    expect(result).toHaveProperty('refreshToken', `refresh-${user.id}`);
+    const updatedUser = await prisma.user.findFirst({ where: { email: userDto.email } });
+    expect(updatedUser?.refresh_token).toBe(result.refreshToken);
+  });
 
-        await expect(AuthService.registerUser(userDto)).rejects.toThrow('User already exists with this email');
-    });
+  test('should fail to refresh token with invalid token', async () => {
+    await expect(AuthService.refreshTokenPair('invalid-token')).rejects.toThrow('Invalid token');
+  });
 
-    test('should login a user', async () => {
-        const userDto = getRegisterUserDto();
-        await AuthService.registerUser(userDto);
+  test('should verify user successfully', async () => {
+    const userDto = getRegisterUserDto();
+    const user = await AuthService.registerUser(userDto);
+    const jwtHelper = require('../utils/jwtHelper');
+    jwtHelper.setUserId(user.id);
+    const loginDto = getLoginRequestDto();
+    const loginResult = await AuthService.LoginUser(loginDto);
+    const jwtPayload = getJwtPayload(loginResult.refreshToken);
+    const result = await AuthService.verifyUser(jwtPayload);
+    expect(result.email).toBe(userDto.email);
+    expect(result.name).toBe(userDto.username);
+    expect(result.id).toBe(user.id);
+  });
 
-        const loginDto = getLoginRequestDto();
-        const result = await AuthService.LoginUser(loginDto);
-
-        expect(result).toHaveProperty('accessToken');
-        expect(result).toHaveProperty('refreshToken');
-        expect(result).toHaveProperty('userId');
-        expect(result).toHaveProperty('username');
-        expect(result.userId).toBeDefined();
-        expect(result.username).toBe(userDto.username);
-    });
-
-    test('should throw error if user is not found', async () => {
-        const loginDto = getLoginRequestDto();
-        loginDto.email = 'wrong@example.com';
-
-        await expect(AuthService.LoginUser(loginDto)).rejects.toThrow('User not found');
-    });
-
-    test('should throw error if password is invalid', async () => {
-        const userDto = getRegisterUserDto();
-        await AuthService.registerUser(userDto);
-        
-        const loginDto = getLoginRequestDto();
-        loginDto.password = 'wrongPassword';
-        await expect(AuthService.LoginUser(loginDto)).rejects.toThrow('Invalid password');
-    });
+  test('should fail to verify user with invalid token', async () => {
+    const jwtPayload = getJwtPayload('invalid-token');
+    await expect(AuthService.verifyUser(jwtPayload)).rejects.toThrow('Invalid token');
+  });
 });

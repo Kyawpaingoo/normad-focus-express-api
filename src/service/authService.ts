@@ -4,6 +4,7 @@ import { User } from "@prisma/client";
 import { LoginRequestDto, LoginResponseDto, RegisterUserDto } from '../dtos/userDtos';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "./../utils/jwtHelper";
 import { JwtPayload } from "jsonwebtoken";
+import { refreshToken } from '../controller/authController';
 
 export const registerUser = async (user: RegisterUserDto) : Promise<User> => {
     const {username, email, password, confirmPassword} = user;
@@ -63,6 +64,7 @@ export const LoginUser = async (loginDto: LoginRequestDto): Promise<LoginRespons
     const accessToken = generateAccessToken({ id: user.id, name: user.name });
     const refreshToken = generateRefreshToken({ id: user.id, name: user.name });
 
+    //console.log(accessToken);
     const result = await prisma.user.update({
         where: {
             id: user.id,
@@ -79,7 +81,7 @@ export const LoginUser = async (loginDto: LoginRequestDto): Promise<LoginRespons
     return { accessToken, refreshToken, userId: user.id, username: user.name };
 }
 
-export const refreshTokenPair = async (token: string) => {
+export const refreshTokenPair = async (token: string) : Promise<{accessToken: string, refreshToken: string}> => {
     const decode: any = verifyRefreshToken(token);
 
     const user = await prisma.user.findFirst({
@@ -109,6 +111,24 @@ export const refreshTokenPair = async (token: string) => {
     }
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+}
+
+
+export const verifyUser = async (jwtUser: JwtPayload) : Promise<User> => {
+    const decode: any = await verifyRefreshToken(jwtUser.refreshToken as string);
+
+    const user: User | null = await prisma.user.findFirst({
+        where: {
+            id: decode.id as number,
+        }
+    });
+
+    if(!user)
+    {
+        throw new Error("User not found");
+    }
+
+    return user;
 }
 
 const hashedPassword = (password: string): Promise<string> => {

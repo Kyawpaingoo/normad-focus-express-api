@@ -36,7 +36,7 @@ model Expense {
   titile       String?   @db.VarChar(50)
   category     String?   @db.VarChar(50)
   amount       Decimal?
-  currency     String?   @default("USD") @db.VarChar(10)
+  currency     String?   @db.VarChar(10)
   expense_date DateTime?
   created_at   DateTime? @default(now())
   is_deleted   Boolean?
@@ -77,7 +77,7 @@ model Task {
   title       String?   @db.VarChar(50)
   description String?   @db.Text
   status      String?   @db.VarChar(50)
-  priority    String? 
+  priority    String?   @db.VarChar(50)
   start_date  DateTime?
   due_date    DateTime?
   notify_at   DateTime?
@@ -90,7 +90,7 @@ model Task {
 model Notification {
   id          Int              @id @default(autoincrement())
   user_id     Int
-  source_type String? 
+  source_type String?         @db.VarChar(50)
   source_id   Int
   message     String?          @db.Text
   notify_at   DateTime?
