@@ -15,4 +15,5 @@ export type LoginResponseDto = {
     refreshToken: string;
     userId: number;
     username: string | null;
+    email: string | null;
 }

@@ -3,6 +3,7 @@ import * as AuthService from "../service/authService";
 import { RegisterUserDto, LoginRequestDto, LoginResponseDto } from "./../dtos/userDtos";
 import { errorResponse, successResponse } from "./../utils/jsonResponse";
 import { JwtPayload } from "jsonwebtoken";
+import { access } from "fs";
 
 declare global {
   namespace Express {
@@ -16,8 +17,8 @@ declare global {
 export const register = async (req: Request, res: Response) : Promise<void> => {
     try {
         const user = await AuthService.registerUser(req.body as RegisterUserDto);
-
-        successResponse(res, user, "User registered successfully");
+        const {id, name, email} = user
+        successResponse(res, { id, name, email }, "User registered successfully");
     }
     catch(error: any)
     {
@@ -28,8 +29,8 @@ export const register = async (req: Request, res: Response) : Promise<void> => {
 export const login = async (req: Request, res: Response) : Promise<void> => {
     try {
         const response: LoginResponseDto = await AuthService.LoginUser(req.body as LoginRequestDto);
-
-        res.cookie('accessToken', refreshToken, {
+        const { userId, username, email, accessToken, refreshToken } = response;
+        res.cookie('accessToken', accessToken, {
             httpOnly: true, 
             maxAge: 15 * 60 * 1000,
             secure: false,
@@ -43,7 +44,7 @@ export const login = async (req: Request, res: Response) : Promise<void> => {
             sameSite: 'lax'
         });
 
-        successResponse(res, response, "User logged in successfully");
+        successResponse(res, { userId, username, email }, "User logged in successfully");
     }
     catch(error: any)
     {
@@ -53,7 +54,8 @@ export const login = async (req: Request, res: Response) : Promise<void> => {
 
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
     try {
-        const token = req.cookies.refreskToken as string;
+        const token = req.cookies.refreshToken as string;
+        console.log(token)
         if(!token) throw new Error("Token not found in cookies");
 
         const {accessToken, refreshToken} = await AuthService.refreshTokenPair(token);
@@ -83,11 +85,11 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
 export const verifyUser = async  (req: Request, res: Response): Promise<void> => {
     try {
         const user = await AuthService.verifyUser(req.jwtUser as JwtPayload);
-
-        successResponse(res, user, "User verified successfully");
+        const {id, name, email} = user;
+        successResponse(res, { id, name, email }, "User verified successfully");
     }
     catch (error: any)
     {
-        errorResponse(error as Error, 401, error.message, res);
+        errorResponse(error as Error, 403, error.message, res);
     }
 }

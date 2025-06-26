@@ -2,7 +2,7 @@ import prisma from "./../prisma";
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { LoginRequestDto, LoginResponseDto, RegisterUserDto } from '../dtos/userDtos';
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "./../utils/jwtHelper";
+import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from "./../utils/jwtHelper";
 import { JwtPayload } from "jsonwebtoken";
 import { refreshToken } from '../controller/authController';
 
@@ -78,7 +78,7 @@ export const LoginUser = async (loginDto: LoginRequestDto): Promise<LoginRespons
         throw new Error("Failed to update user with refresh token");
     }
 
-    return { accessToken, refreshToken, userId: user.id, username: user.name };
+    return { accessToken, refreshToken, userId: user.id, username: user.name, email: user.email };
 }
 
 export const refreshTokenPair = async (token: string) : Promise<{accessToken: string, refreshToken: string}> => {
@@ -115,11 +115,12 @@ export const refreshTokenPair = async (token: string) : Promise<{accessToken: st
 
 
 export const verifyUser = async (jwtUser: JwtPayload) : Promise<User> => {
-    const decode: any = await verifyRefreshToken(jwtUser.refreshToken as string);
+    // console.log(jwtUser);
+    // const decode: any = verifyRefreshToken(jwtUser);
 
     const user: User | null = await prisma.user.findFirst({
         where: {
-            id: decode.id as number,
+            id: jwtUser.id as number,
         }
     });
 

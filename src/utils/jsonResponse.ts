@@ -2,13 +2,11 @@ import { Response } from "express";
 import { errorResponseDto, successResponseDto } from "../dtos/responseDto";
 
 // Success Response Function
-export function successResponse(res: Response, data: any, message: string = "Operation successful", token?: string, pagination?: any) {
+export function successResponse(res: Response, data: any, message: string = "Operation successful") {
     const responsePayload: successResponseDto = {
         success: true,
         data,
         msg: message,
-        token: token || null,
-        pagination: pagination || null,
     };
 
     res.status(200).json(responsePayload);

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -12,24 +12,21 @@ declare global {
   }
 }
 
-
 const secretKey : string | undefined = process.env.JWT_SECRET as string
 export const auth = (req: Request, res: Response, next: NextFunction): void => {
-    const {authorization} = req.headers;
-
-    const token: string | undefined= authorization && authorization.split(' ')[1];
+    const token: string | undefined = req.cookies.accessToken;
+    
     if(!token) {
-      res.status(401).json({error: 'Token not found'});
+      res.status(403).json({error: 'Token not found'});
       return;
     } 
 
-    const user = jwt.verify(token, secretKey) as JwtPayload
-
-    if(!user) {
-      res.status(401).json({error: 'Invalid token'});
-      return;
-    } 
-
-    req.jwtUser = user;
-    next();
+    jwt.verify(token, secretKey, (err, data) => {
+      if(err) {
+        res.status(403).json({error: 'Invalid token'});
+        return;
+      }
+      req.jwtUser = data;
+      next();
+    })
 }
