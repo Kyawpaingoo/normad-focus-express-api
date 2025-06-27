@@ -3,7 +3,6 @@ import * as AuthService from "../service/authService";
 import { RegisterUserDto, LoginRequestDto, LoginResponseDto } from "./../dtos/userDtos";
 import { errorResponse, successResponse } from "./../utils/jsonResponse";
 import { JwtPayload } from "jsonwebtoken";
-import { access } from "fs";
 
 declare global {
   namespace Express {

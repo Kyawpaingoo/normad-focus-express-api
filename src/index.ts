@@ -5,6 +5,7 @@ import fileUpload from 'express-fileupload';
 import cors, { CorsOptions } from 'cors';
 import prisma from './prisma';
 import authRouter from './router/authRouter';
+import expenseRouter from './router/expenseRouter';
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ async function main()
 {
     try {
         app.use('/api/auth', authRouter);
+        app.use('/api/expense', expenseRouter);
         app.listen(port,()=> {
             console.log(`Server is running on port ${port}`);
         });

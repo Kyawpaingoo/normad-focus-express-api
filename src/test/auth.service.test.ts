@@ -3,13 +3,12 @@ import prisma from '../prisma'
 import { JwtPayload } from 'jsonwebtoken';
 import * as AuthService from '../service/authService';
 
-// Mock bcrypt
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
   compare: jest.fn().mockImplementation((password, hash) => Promise.resolve(password === 'testPassword' && hash === 'hashedPassword'))
 }));
 
-// Mock jwtHelper with dynamic user ID
+
 jest.mock('../utils/jwtHelper', () => {
   let userId: number | null = null;
   return {

@@ -10,3 +10,8 @@ export type errorResponseDto = {
     error: string;
     status: number;
 }
+
+export const dataResponseDto = {
+    Success: "Success",
+    Error: "Error"
+}
