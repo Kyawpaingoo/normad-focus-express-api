@@ -13,6 +13,7 @@ export const insert = async (expense: upsertExpenseRequestDto): Promise<Expense>
             category: expense.category,
             currency: expense.currency,
             expense_date: expense.expense_date,
+            type: expense.type,
             note: expense.note,
             is_deleted: false
         }
@@ -49,6 +50,7 @@ export const updateExpense = async (id: number , userId: number, expense: upsert
             category: expense.category,
             currency: expense.currency,
             expense_date: expense.expense_date,
+            type: expense.type,
             note: expense.note
         }
     });
@@ -87,7 +89,7 @@ export const hardDeleteExpense = async (id: number, userId: number): Promise<str
     return dataResponseDto.Success;
 }
 
-export const getByPaging = async (page: number, pageSize: number, userId: number, year: number, month: number, sortDir: sortDirection = 'desc', q?: string, category?: string): Promise<PaginationResponse<Expense>> => {
+export const getByPaging = async (page: number, pageSize: number, userId: number, year: number, month: number, sortDir: sortDirection = 'desc', q?: string, category?: string, type?: string): Promise<PaginationResponse<Expense>> => {
 
     const startDate = new Date(year, month -1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);

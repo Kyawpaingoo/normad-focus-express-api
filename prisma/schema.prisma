@@ -33,8 +33,9 @@ model User {
 model Expense {
   id           Int       @id @default(autoincrement())
   user_id      Int
-  title       String?   @db.VarChar(50)
+  title        String?   @db.VarChar(50)
   category     String?   @db.VarChar(50)
+  type         String?   @db.VarChar(50)
   amount       Decimal?
   currency     String?   @db.VarChar(10)
   note         String?   @db.Text

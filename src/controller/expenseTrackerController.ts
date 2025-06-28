@@ -1,8 +1,10 @@
 import { Request, Response } from "express"
 import * as expenseService from "../service/expenseTrackerService"
 import { upsertExpenseRequestDto } from "../dtos/expenseTrackerDto";
-import { errorResponse, successResponse } from "src/utils/jsonResponse";
+import { errorResponse, successResponse } from "../utils/jsonResponse";
 import { sortDirection } from "../utils/pagination";
+import { PaginationResponse } from "../utils/pagination";
+import { Expense } from "@prisma/client";
 
 export const insertExpense = async (req: Request, res: Response) : Promise<void> => {
     try {
@@ -39,9 +41,9 @@ export const updateExpense = async (req: Request, res: Response) : Promise<void>
 
 export const getByPaging = async (req: Request, res: Response) : Promise<void> => {
     try {
-        const {page, pageSize, userId, year, month, sortDir, q, category} = req.params;
+        const {page, pageSize, userId, year, month, sortDir, q, category, type} = req.params;
 
-        const result = await expenseService.getByPaging(parseInt(page), parseInt(pageSize), parseInt(userId), parseInt(year), parseInt(month), sortDir as sortDirection, q, category);
+        const result: PaginationResponse<Expense> = await expenseService.getByPaging(parseInt(page), parseInt(pageSize), parseInt(userId), parseInt(year), parseInt(month), sortDir as sortDirection, q, category, type);
 
         successResponse(res, result, "Expense details fetched successfully");
     }
