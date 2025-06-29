@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response) : Promise<void> => {
 export const login = async (req: Request, res: Response) : Promise<void> => {
     try {
         const response: LoginResponseDto = await AuthService.LoginUser(req.body as LoginRequestDto);
-        const { userId, username, email, accessToken, refreshToken } = response;
+        const { id, name, email, accessToken, refreshToken } = response;
         res.cookie('accessToken', accessToken, {
             httpOnly: true, 
             maxAge: 15 * 60 * 1000,
@@ -43,7 +43,7 @@ export const login = async (req: Request, res: Response) : Promise<void> => {
             sameSite: 'lax'
         });
 
-        successResponse(res, { userId, username, email }, "User logged in successfully");
+        successResponse(res, { id, name, email }, "User logged in successfully");
     }
     catch(error: any)
     {
@@ -54,7 +54,7 @@ export const login = async (req: Request, res: Response) : Promise<void> => {
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
     try {
         const token = req.cookies.refreshToken as string;
-        console.log(token)
+        //console.log(token)
         if(!token) throw new Error("Token not found in cookies");
 
         const {accessToken, refreshToken} = await AuthService.refreshTokenPair(token);

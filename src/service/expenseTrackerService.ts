@@ -94,30 +94,58 @@ export const getByPaging = async (page: number, pageSize: number, userId: number
     const startDate = new Date(year, month -1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 
-     const query = await prisma?.expense.findMany({
-        where: {
-            user_id: userId,
-            is_deleted: false,
-            expense_date: {
-                gte: startDate,
-                lte: endDate
-            },
-            ...(q && {
-                title: {
-                    contains: q,
-                    mode: 'insensitive'
-                }
-            }),
-            ...(category && { category })
+    const whereClause = {
+        user_id: userId,
+        is_deleted: false,
+        expense_date: {
+            gte: startDate,
+            lte: endDate
         },
-        orderBy: {
-            expense_date: sortDir
-        }
+        ...(q && {
+            title: {
+                contains: q,
+                mode: 'insensitive' as const
+            }
+        }),
+        ...(category && { category }),
+        ...(type && { type })
+    };
+
+    const totalCount = await prisma.expense.count({
+        where: whereClause
     });
 
-    if(!query || query.length === 0) return getPaging(page, pageSize, []);
 
-    const result: PaginationResponse<Expense> = getPaging(page, pageSize, query);
+   const expenses = await prisma.expense.findMany({
+        where: whereClause,
+        orderBy: {
+            expense_date: sortDir === 'asc' ? 'asc' : 'desc'
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize
+    });
+
+    const totalPage = Math.ceil(totalCount / pageSize);
+
+    if(!expenses || expenses.length === 0) return {
+            totalCount: 0,
+            totalPage: 0,
+            results: [],
+            page,
+            pageSize,
+            hasNextPage: false,
+            hasPrevPage: false
+        };
+
+    const result: PaginationResponse<Expense> = {
+        totalCount,
+        totalPage,
+        page,
+        pageSize,
+        hasNextPage: page < totalPage,
+        hasPrevPage: page > 1,
+        results: expenses
+    };
 
     return result;
 }

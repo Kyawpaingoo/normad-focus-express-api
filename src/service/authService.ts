@@ -78,7 +78,7 @@ export const LoginUser = async (loginDto: LoginRequestDto): Promise<LoginRespons
         throw new Error("Failed to update user with refresh token");
     }
 
-    return { accessToken, refreshToken, userId: user.id, username: user.name, email: user.email };
+    return { accessToken, refreshToken, id: user.id, name: user.name, email: user.email };
 }
 
 export const refreshTokenPair = async (token: string) : Promise<{accessToken: string, refreshToken: string}> => {
