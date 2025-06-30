@@ -24,6 +24,7 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.1",
+    "jest-mock-extended": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.2"
   },
