@@ -1,8 +1,7 @@
 import { PrismaClient, Task } from "@prisma/client";
 import { upsertTaskDto } from "../dtos/taskDto";
 import * as TaskService from '../service/taskService';
-import { stat } from "fs";
-import { update } from '../service/taskService';
+import { InfiniteScrollResponse, KanbanResponse } from "../utils/pagination";
 
 const prisma = new PrismaClient();
 
@@ -87,6 +86,33 @@ describe('TaskService (Integration Tests)', () => {
         expect(result.priority).toBe(dto.priority);
     });
 
+    
+
+    test('should get tasks for kanban view successfully', async () => {
+        const result = await TaskService.getTasksByView('kanban', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
+
+        expect(result).not.toBeNull();
+        expect(result).toBeDefined();
+
+        expect('columns' in result).toBe(true);
+
+        const kanbanResult = result as KanbanResponse<Task>;
+        expect(kanbanResult.totalCount).toBeGreaterThanOrEqual(0);
+        expect(kanbanResult.columns['in-progress']?.items[0]).not.toBeNull();
+    });
+
+    test('should get paginated tasks for infinite scroll view successfully', async () => {
+        const result = await TaskService.getTasksByView('list', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
+
+        expect(result).not.toBeNull();
+        expect(result).toBeDefined();
+
+        expect('results' in result).toBe(true);
+
+        const listResult = result as InfiniteScrollResponse<Task>;
+        expect(listResult.totalCount).toBeGreaterThanOrEqual(0);
+    });
+
     test('should soft delete task successfully', async ()=> {
         const result = await TaskService.softDelete(insertedTask.id, 1);
 
@@ -96,13 +122,6 @@ describe('TaskService (Integration Tests)', () => {
         expect(deleted?.is_deleted).toBe(true);
     });
 
-    test('should get paginated tasks successfully', async ()=> {
-        const result = await TaskService.getByPaging(1, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
-
-        expect(result).not.toBeNull();
-        expect(result?.results?.length).toBeGreaterThanOrEqual(1);
-        expect(result?.results[0].user_id).toBe(1);
-    })
 
     test('should hard delete task successfully', async ()=> {
         const result = await TaskService.hardDelete(insertedTask.id, 1);
@@ -110,11 +129,25 @@ describe('TaskService (Integration Tests)', () => {
         expect(result).toBe('Task deleted successfully');
     });
 
-    test('should return null when no task found', async()=> {
+    test('should return null when no task found in kanban view', async()=> {
         await prisma.task.deleteMany();
 
-        const result = await TaskService.getByPaging(1, 10, 1, 2025, 1);
+        const result = await TaskService.getTasksByView('kanban', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
 
-        expect(result.results).toEqual([]);
+        const kanbanResult = result as KanbanResponse<Task>;
+
+        expect(kanbanResult.columns).toEqual({});
+        expect(kanbanResult.totalCount).toBe(0);
+    })
+
+    test('should return null when no task found in infinite scroll view', async()=> {
+        await prisma.task.deleteMany();
+
+        const result = await TaskService.getTasksByView('list', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
+
+        const listResult = result as InfiniteScrollResponse<Task>;
+
+        expect(listResult.results).toEqual([]);
+        expect(listResult.totalCount).toBe(0);
     })
 });

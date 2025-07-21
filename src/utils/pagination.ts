@@ -11,20 +11,24 @@ export type PaginationResponse<T> ={
 
 export type sortDirection = "asc" | "desc";
 
-export function getPaging<T>(page: number, pageSize: number, result: T[], addiontalData?: string): PaginationResponse<T> {
-    
-    const totalCount = result.length;
-    const totalPage = Math.ceil(totalCount / pageSize);
-    const dataList = result.slice((page - 1) * pageSize, page * pageSize);
+export type ViewMode = 'list' | 'board';
 
-    return {
-        totalCount,
-        totalPage,
-        page,
-        pageSize,
-        hasNextPage: page < totalPage,
-        hasPrevPage: page > 1,
-        results: dataList,
-        additionalData: addiontalData
-    };
+export type InfiniteScrollResponse<T> = {
+    results: T[] | [],
+    nextCursor: string | null,
+    hasNextPage: boolean,
+    totalCount?: number,
+    additionalData?: string
 }
+
+export type KanbanResponse<T> = {
+    columns: Record<string, {
+        title: string;
+        items: T[];
+        totalCount: number;
+    }>,
+    totalCount: number;
+    addtionalData?: string;
+}
+
+export type FlexibleResponse<T> = InfiniteScrollResponse<T> | KanbanResponse<T>;
