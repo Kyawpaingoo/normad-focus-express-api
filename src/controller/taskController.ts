@@ -9,7 +9,7 @@ import { upsertNotificationRequestDto } from "../dtos/notificationDto";
 export const createTask = async (req: Request, res: Response): Promise<void> => {
     try {
         const result = await taskService.insert(req.body as upsertTaskDto);
-
+       
         if(result.notify_at != null)
         {
             const notificationDto: upsertNotificationRequestDto = {
@@ -17,7 +17,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
                 source_type: "Task", 
                 source_id: result.id, 
                 title: result.title,
-                message: `You have a task to do at ${result.notify_at}`, 
+                message: `Reminder: You have a task called ${result.title} to do at ${result.start_date}`, 
                 notify_at: result.notify_at
             };
             await notificationService.insert(notificationDto);
@@ -45,6 +45,10 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     try {
         const {id, userId} = req.params;
         const result = await taskService.update(parseInt(id), parseInt(userId), req.body as upsertTaskDto);
+
+        if(result != null) {
+            await notificationService.update(result.id, result.notify_at);
+        }
         successResponse(res, result, "Task updated successfully");
     }
     catch(error: any) {
