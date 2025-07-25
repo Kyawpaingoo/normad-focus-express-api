@@ -13,6 +13,7 @@ describe('ExpenseService (Integration Tests)', () => {
     amount: 100.00,
     category: 'Food',
     currency: 'USD',
+    type: 'Expense',
     expense_date: new Date(),
     note: 'Test note',
   });
@@ -23,6 +24,7 @@ describe('ExpenseService (Integration Tests)', () => {
     amount: 200.00,
     category: 'Food',
     currency: 'USD',
+    type: 'Expense',
     expense_date: new Date(),
     note: 'Updated note',
   });
@@ -30,7 +32,6 @@ describe('ExpenseService (Integration Tests)', () => {
   let insertedExpense: Expense;
 
   beforeEach(async () => {
-    // Clean up and seed with 1 expense record
     await prisma.expense.deleteMany();
     insertedExpense = await prisma.expense.create({
       data: {

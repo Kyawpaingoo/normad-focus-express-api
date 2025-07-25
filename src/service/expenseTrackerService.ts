@@ -2,7 +2,7 @@ import { Expense } from "@prisma/client";
 import { upsertExpenseRequestDto } from "../dtos/expenseTrackerDto";
 import { dataResponseDto } from "../dtos/responseDto";
 import prisma from "../prisma";
-import { getPaging, PaginationResponse, sortDirection } from "../utils/pagination";
+import { PaginationResponse, sortDirection } from "../utils/pagination";
 import { months } from "../dtos/months";
 
 export const insert = async (expense: upsertExpenseRequestDto): Promise<Expense> => {

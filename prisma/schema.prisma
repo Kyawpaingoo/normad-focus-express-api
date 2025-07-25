@@ -94,10 +94,12 @@ model Notification {
   user_id     Int
   source_type String?         @db.VarChar(50)
   source_id   Int
+  title String?
   message     String?          @db.Text
   notify_at   DateTime?
   sent_at     DateTime?
   created_at  DateTime?        @default(now())
+  sent Boolean? @default(false)
 
   user User @relation(fields: [user_id], references: [id])
 }
