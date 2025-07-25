@@ -6,15 +6,13 @@ import prisma from "../prisma";
 export const insert = async (task: upsertTaskDto): Promise<Task> => {
     const result: Task | undefined = await prisma?.task.create({
         data: {
-            user_id: task.userId,
-            title: task.title,
-            description: task.description,
+            ...task,
             status: task.status,
             priority: task.priority,
-            start_date: task.start_date,
-            due_date: task.due_date,
-            notify_at: task.notify_at,
-            is_deleted: false
+            is_deleted: false,
+            user: {
+                connect: { id: task.userId }
+            }
         }
     });
 
@@ -44,13 +42,7 @@ export const update = async (id: number, userId: number, task: upsertTaskDto): P
             user_id: userId
         },
         data: {
-            title: task.title,
-            description: task.description,
-            status: task.status,
-            priority: task.priority,
-            start_date: task.start_date,
-            due_date: task.due_date,
-            notify_at: task.notify_at
+            ...task
         }
     });
     

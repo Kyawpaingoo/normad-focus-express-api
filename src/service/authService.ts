@@ -2,9 +2,8 @@ import prisma from "./../prisma";
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { LoginRequestDto, LoginResponseDto, RegisterUserDto } from '../dtos/userDtos';
-import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from "./../utils/jwtHelper";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "./../utils/jwtHelper";
 import { JwtPayload } from "jsonwebtoken";
-import { refreshToken } from '../controller/authController';
 
 export const registerUser = async (user: RegisterUserDto) : Promise<User> => {
     const {username, email, password, confirmPassword} = user;
