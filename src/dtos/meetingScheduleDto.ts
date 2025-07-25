@@ -4,6 +4,4 @@ export type upsertMeetingSchdeuleDto = {
     description: string, 
     start_time: Date,
     end_time: Date
-    created_at: Date
-    is_deleted: boolean
 }

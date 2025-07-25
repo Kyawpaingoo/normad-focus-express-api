@@ -89,7 +89,7 @@ describe('TaskService (Integration Tests)', () => {
     
 
     test('should get tasks for kanban view successfully', async () => {
-        const result = await TaskService.getTasksByView('kanban', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
+        const result = await TaskService.getTasksByView('board', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
 
         expect(result).not.toBeNull();
         expect(result).toBeDefined();
@@ -132,7 +132,7 @@ describe('TaskService (Integration Tests)', () => {
     test('should return null when no task found in kanban view', async()=> {
         await prisma.task.deleteMany();
 
-        const result = await TaskService.getTasksByView('kanban', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
+        const result = await TaskService.getTasksByView('board', null, 10, 1, new Date().getFullYear(), new Date().getMonth() + 1);
 
         const kanbanResult = result as KanbanResponse<Task>;
 

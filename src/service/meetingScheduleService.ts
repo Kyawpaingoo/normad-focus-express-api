@@ -8,6 +8,7 @@ export const insert = async (dto: upsertMeetingSchdeuleDto): Promise<MeetingSche
     const result: MeetingSchedule | undefined = await prisma?.meetingSchedule.create({
         data: {
             ...dto,
+            created_at: new Date(),
             is_deleted: false
         }
     });

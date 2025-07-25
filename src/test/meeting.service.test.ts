@@ -11,8 +11,6 @@ describe('MeetingScheduleService (Integration Tests)', () => {
     description: 'Test Description',
     start_time: new Date('2025-08-01T10:00:00'),
     end_time: new Date('2025-08-01T11:00:00'),
-    created_at: new Date(),
-    is_deleted: false
   });
 
   const getUpdateDto = (): upsertMeetingSchdeuleDto => ({
@@ -21,8 +19,6 @@ describe('MeetingScheduleService (Integration Tests)', () => {
     description: 'Updated Description',
     start_time: new Date('2025-08-01T12:00:00'),
     end_time: new Date('2025-08-01T13:00:00'),
-    created_at: new Date(),
-    is_deleted: false
   });
 
   let insertedMeeting: MeetingSchedule;
