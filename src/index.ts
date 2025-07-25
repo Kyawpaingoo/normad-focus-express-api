@@ -7,6 +7,7 @@ import prisma from './prisma';
 import authRouter from './router/authRouter';
 import expenseRouter from './router/expenseRouter';
 import taskRouter from './router/taskRouter';
+import meetingScheduleRouter from './router/meetingScheduleRouter';
 
 dotenv.config();
 const app = express();
@@ -33,6 +34,7 @@ async function main()
         app.use('/api/auth', authRouter);
         app.use('/api/expense', expenseRouter);
         app.use('/api/task', taskRouter);
+        app.use('/api/meeting-schedule',  meetingScheduleRouter);
         app.listen(port,()=> {
             console.log(`Server is running on port ${port}`);
         });

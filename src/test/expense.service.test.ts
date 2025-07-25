@@ -2,7 +2,6 @@ import { PrismaClient, Expense, Prisma } from '@prisma/client';
 import * as ExpenseService from '../service/expenseTrackerService';
 import { upsertExpenseRequestDto } from '../dtos/expenseTrackerDto';
 import { dataResponseDto } from '../dtos/responseDto';
-import { PaginationResponse } from '../utils/pagination';
 
 const prisma = new PrismaClient();
 
