@@ -64,7 +64,7 @@ model MeetingSchedule {
   id          Int       @id @default(autoincrement())
   user_id     Int
   title       String?   @db.VarChar(255)
-  description String?   @db.Text // MAX-like behavior
+  description String?   
   start_time  DateTime
   end_time    DateTime
   created_at  DateTime? @default(now())

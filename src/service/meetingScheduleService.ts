@@ -3,13 +3,20 @@ import { upsertMeetingSchdeuleDto } from '../dtos/meetingScheduleDto';
 import { createEvent, DateTime } from 'ics';
 import { PaginationResponse, sortDirection } from '../utils/pagination';
 import prisma from "../prisma";
+import { start } from 'repl';
 
 export const insert = async (dto: upsertMeetingSchdeuleDto): Promise<MeetingSchedule> => {
+   
     const result: MeetingSchedule | undefined = await prisma?.meetingSchedule.create({
         data: {
-            ...dto,
+            user_id: dto.user_id,
+            title: dto.title,
+            start_time: dto.start_time,
+            end_time: dto.end_time,
+            description: dto.description,
             created_at: new Date(),
-            is_deleted: false
+            is_deleted: false,
+            
         }
     });
 

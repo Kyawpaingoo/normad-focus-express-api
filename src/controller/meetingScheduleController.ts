@@ -6,6 +6,7 @@ import { PaginationResponse, sortDirection } from "../utils/pagination";
 import { MeetingSchedule } from "@prisma/client";
 
 export const insertMeetingSchedule = async (req: Request, res: Response): Promise<void> => {
+    
     try {
         const result = await meetingSchdeuleService.insert(req.body as upsertMeetingSchdeuleDto);
 
@@ -20,6 +21,7 @@ export const getByID = async(req: Request, res: Response): Promise<void> => {
     try {
         const {id, userId} = req.params;
         const reuslt = await meetingSchdeuleService.getById(parseInt(id), parseInt(userId));
+        console.log(reuslt)
 
         successResponse(res, reuslt, "Meeting details fetched successfully");
     }
