@@ -24,3 +24,9 @@ export function errorResponse(e: Error, status: number, message: string = e.mess
 
     res.status(status).json(responsePayload);
 }
+
+export function icsContentResponse(res: Response, meetingId: number, icsContent: string) {
+    res.setHeader('Content-Type', 'text/calendar');
+    res.setHeader('Content-Disposition', `attachment; filename=meeting-${meetingId}.ics`);
+    res.send(icsContent);
+}

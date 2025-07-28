@@ -5,18 +5,14 @@ import prisma from "../prisma";
 import { PaginationResponse, sortDirection } from "../utils/pagination";
 import { months } from "../dtos/months";
 
-export const insert = async (expense: upsertExpenseRequestDto): Promise<Expense> => {
+export const insert = async (data: upsertExpenseRequestDto): Promise<Expense> => {
     const result: Expense | undefined = await prisma?.expense.create({
         data: {
-            user_id: expense.userId,
-            title: expense.title,
-            amount: expense.amount,
-            category: expense.category,
-            currency: expense.currency,
-            expense_date: expense.expense_date,
-            type: expense.type,
-            note: expense.note,
-            is_deleted: false
+           ...data,
+            is_deleted: false,
+            user: {
+                connect: { id: data.userId }
+            }
         }
     });
 
@@ -46,13 +42,7 @@ export const updateExpense = async (id: number , userId: number, expense: upsert
             user_id: userId
         },
         data: {
-            title: expense.title,
-            amount: expense.amount,
-            category: expense.category,
-            currency: expense.currency,
-            expense_date: expense.expense_date,
-            type: expense.type,
-            note: expense.note
+            ...expense
         }
     });
 

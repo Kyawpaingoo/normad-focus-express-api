@@ -45,7 +45,7 @@ export const getByPaging = async (req: Request, res: Response) : Promise<void> =
 
         const result: PaginationResponse<Expense> = await expenseService.getByPaging(parseInt(page as string), parseInt(pageSize as string), parseInt(userId as string), parseInt(year as string), parseInt(month as string), sortDir as sortDirection, q as string, category as string, type as string);
 
-        successResponse(res, result, "Expense details fetched successfully");
+        successResponse(res, result, "Expense Paging fetched successfully");
     }
     catch(error: any) {
         errorResponse(error as Error, 400, error.message, res);
