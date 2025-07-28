@@ -8,6 +8,7 @@ import authRouter from './router/authRouter';
 import expenseRouter from './router/expenseRouter';
 import taskRouter from './router/taskRouter';
 import meetingScheduleRouter from './router/meetingScheduleRouter';
+import countryLogRouter from './router/countryLogRouter';
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,7 @@ async function main()
         app.use('/api/expense', expenseRouter);
         app.use('/api/task', taskRouter);
         app.use('/api/meeting-schedule',  meetingScheduleRouter);
+        app.use('/api/country-log', countryLogRouter);
         app.listen(port,()=> {
             console.log(`Server is running on port ${port}`);
         });
