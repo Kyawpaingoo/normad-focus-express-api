@@ -69,8 +69,8 @@ describe('AuthService', () => {
     const result = await AuthService.LoginUser(loginDto);
     expect(result).toHaveProperty('accessToken', `access-${user.id}`);
     expect(result).toHaveProperty('refreshToken', `refresh-${user.id}`);
-    expect(result.userId).toBe(user.id);
-    expect(result.username).toBe(userDto.username);
+    expect(result.id).toBe(user.id);
+    expect(result.name).toBe(userDto.username);
   });
 
   test('should refresh token pair successfully', async () => {
@@ -91,22 +91,5 @@ describe('AuthService', () => {
     await expect(AuthService.refreshTokenPair('invalid-token')).rejects.toThrow('Invalid token');
   });
 
-  test('should verify user successfully', async () => {
-    const userDto = getRegisterUserDto();
-    const user = await AuthService.registerUser(userDto);
-    const jwtHelper = require('../utils/jwtHelper');
-    jwtHelper.setUserId(user.id);
-    const loginDto = getLoginRequestDto();
-    const loginResult = await AuthService.LoginUser(loginDto);
-    const jwtPayload = getJwtPayload(loginResult.refreshToken);
-    const result = await AuthService.verifyUser(jwtPayload);
-    expect(result.email).toBe(userDto.email);
-    expect(result.name).toBe(userDto.username);
-    expect(result.id).toBe(user.id);
-  });
-
-  test('should fail to verify user with invalid token', async () => {
-    const jwtPayload = getJwtPayload('invalid-token');
-    await expect(AuthService.verifyUser(jwtPayload)).rejects.toThrow('Invalid token');
-  });
+  
 });

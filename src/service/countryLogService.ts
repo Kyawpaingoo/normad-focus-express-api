@@ -4,9 +4,16 @@ import prisma from "../prisma";
 import { PaginationResponse, sortDirection } from "src/utils/pagination";
 
 export const insert = async (data: upsertCountryLog): Promise<CountryLog> => {
+
     const result: CountryLog | undefined = await prisma?.countryLog.create({
         data: {
-            ...data,
+            user_id: data.user_id,
+            country_name: data.country_name,
+            visa_type: data.visa_type,
+            visa_limit_days: data.visa_limit_days,
+            entry_date: data.entry_date,
+            exit_date: data.exit_date,
+            notify_at: data.notify_at,
             created_at: new Date(),
         }
     });

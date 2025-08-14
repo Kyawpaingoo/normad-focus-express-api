@@ -1,5 +1,5 @@
 export type upsertExpenseRequestDto = {
-    userId: number,
+    user_id: number,
     title: string,
     amount: number,
     category: string,

@@ -4,18 +4,20 @@ import { sortDirection, InfiniteScrollResponse, KanbanResponse, ViewMode, Flexib
 import prisma from "../prisma";
 
 export const insert = async (task: upsertTaskDto): Promise<Task> => {
-    const result: Task | undefined = await prisma?.task.create({
+
+    const result = await prisma.task.create({
         data: {
-            ...task,
-            status: task.status,
-            priority: task.priority,
+            title: task.title || null,
+            description: task.description || null,
+            status: task.status || 'To Do',
+            priority: task.priority || 'Low',
+            start_date: task.start_date || null,
+            due_date: task.due_date || null,
+            notify_at: task.notify_at || null,
             is_deleted: false,
-            user: {
-                connect: { id: task.userId }
-            }
+            user_id: task.userId
         }
     });
-
     if(!result) throw new Error("Task insertion failed");
 
     return result;
@@ -42,7 +44,15 @@ export const update = async (id: number, userId: number, task: upsertTaskDto): P
             user_id: userId
         },
         data: {
-            ...task
+            title: task.title || null,
+            description: task.description || null,
+            status: task.status || 'To Do',
+            priority: task.priority || 'Low',
+            start_date: task.start_date || null,
+            due_date: task.due_date || null,
+            notify_at: task.notify_at || null,
+            is_deleted: false,
+            user_id: task.userId
         }
     });
     

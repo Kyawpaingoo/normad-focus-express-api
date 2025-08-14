@@ -9,6 +9,8 @@ import expenseRouter from './router/expenseRouter';
 import taskRouter from './router/taskRouter';
 import meetingScheduleRouter from './router/meetingScheduleRouter';
 import countryLogRouter from './router/countryLogRouter';
+import imageUploadRouter from './router/imageUploadRouter';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 const app = express();
@@ -20,11 +22,13 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded(
-    { extended: true }
+    { limit: '50mb', extended: true }
 ));
 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 app.use(fileUpload());
 
@@ -37,6 +41,7 @@ async function main()
         app.use('/api/task', taskRouter);
         app.use('/api/meeting-schedule',  meetingScheduleRouter);
         app.use('/api/country-log', countryLogRouter);
+        app.use('/api/image', imageUploadRouter);
         app.listen(port,()=> {
             console.log(`Server is running on port ${port}`);
         });
