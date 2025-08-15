@@ -9,10 +9,8 @@ export const insert = async (data: upsertExpenseRequestDto): Promise<Expense> =>
     const result: Expense | undefined = await prisma?.expense.create({
         data: {
            ...data,
+           
             is_deleted: false,
-            user: {
-                connect: { id: data.userId }
-            }
         }
     });
 

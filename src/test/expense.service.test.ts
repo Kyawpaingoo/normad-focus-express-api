@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 describe('ExpenseService (Integration Tests)', () => {
   const getInsertExpenseDto = (): upsertExpenseRequestDto => ({
-    userId: 1,
+    user_id: 1,
     title: 'Test Expense',
     amount: 100.00,
     category: 'Food',
@@ -18,7 +18,7 @@ describe('ExpenseService (Integration Tests)', () => {
   });
 
   const getUpdateExpenseDto = (): upsertExpenseRequestDto => ({
-    userId: 1,
+    user_id: 1,
     title: 'Updated Expense',
     amount: 200.00,
     category: 'Food',
@@ -63,7 +63,7 @@ describe('ExpenseService (Integration Tests)', () => {
       note: dto.note,
     });
 
-    expect(result.user_id).toBe(dto.userId);
+    expect(result.user_id).toBe(dto.user_id);
   });
 
   test('should get expense by ID successfully', async () => {
