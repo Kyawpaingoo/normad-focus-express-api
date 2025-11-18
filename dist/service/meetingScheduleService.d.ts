@@ -1,0 +1,10 @@
+import { MeetingSchedule } from '@prisma/client';
+import { upsertMeetingSchdeuleDto } from '../dtos/meetingScheduleDto';
+import { PaginationResponse, sortDirection } from '../utils/pagination';
+export declare const insert: (dto: upsertMeetingSchdeuleDto) => Promise<MeetingSchedule>;
+export declare const getById: (id: number, userId: number) => Promise<MeetingSchedule>;
+export declare const generateICS: (meeting: MeetingSchedule) => Promise<string>;
+export declare const update: (id: number, user_id: number, meeting: upsertMeetingSchdeuleDto) => Promise<MeetingSchedule>;
+export declare const softDelete: (id: number, user_id: number) => Promise<string>;
+export declare const hardDelete: (id: number, user_id: number) => Promise<string>;
+export declare const getbyPaging: (page: number, pageSize: number, userId: number, sortDir: sortDirection, q?: string) => Promise<PaginationResponse<MeetingSchedule>>;

@@ -1,0 +1,11 @@
+import { Task } from "@prisma/client";
+import { upsertTaskDto } from "../dtos/taskDto";
+import { sortDirection, InfiniteScrollResponse, KanbanResponse, ViewMode, FlexibleResponse } from '../utils/pagination';
+export declare const insert: (task: upsertTaskDto) => Promise<Task>;
+export declare const getByID: (id: number, userId: number) => Promise<Task>;
+export declare const update: (id: number, userId: number, task: upsertTaskDto) => Promise<Task>;
+export declare const softDelete: (id: number, userId: number) => Promise<string>;
+export declare const hardDelete: (id: number, userId: number) => Promise<string>;
+export declare const getTasksByView: (viewMode: ViewMode, cursor: string | null, limit: number, userId: number, year: number, month: number, sortDir?: sortDirection, q?: string, status?: string, priority?: string) => Promise<FlexibleResponse<Task>>;
+export declare const getTaskForInfiniteScroll: (cursor: string | null, limit: number, userId: number, year: number, month: number, sortDir?: sortDirection, q?: string, status?: string, priority?: string) => Promise<InfiniteScrollResponse<Task>>;
+export declare const getTaskForKanban: (userId: number, year: number, month: number, sortDir?: sortDirection, q?: string, status?: string, priority?: string) => Promise<KanbanResponse<Task>>;
