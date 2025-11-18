@@ -1,19 +1,36 @@
 {
     "compilerOptions": {
-        "sourceMap": true, 
+        "sourceMap": true,
         "target": "ES2016",
         "outDir": "./dist",
-        "strict": true, 
+        "strict": true,
         "module" : "CommonJS",
-        "baseUrl": ".", 
-        "allowSyntheticDefaultImports": true, 
-        "esModuleInterop": true, 
-        "forceConsistentCasingInFileNames": true
-    }, 
+        "baseUrl": ".",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": true,
+        "removeComments": true,
+        "incremental": true,
+        "skipLibCheck": true,
+        "strictNullChecks": false
+    },
     "include": [
         "src/**/*.ts"
-    ], 
+    ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist",
+        "src/controller",
+        "src/service",
+        "src/router",
+        "src/middleware",
+        "src/imageUpload",
+        "src/test",
+        "src/index.ts",
+        "src/prisma.ts",
+        "src/cloudinaryConfig.ts"
     ]
 }
